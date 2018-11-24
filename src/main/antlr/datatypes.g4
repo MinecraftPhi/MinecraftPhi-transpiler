@@ -1,5 +1,7 @@
 grammar datatypes;
 
+import keywords;
+
 test: literal (('\r'? '\n')+ literal)* ('\r'? '\n')* EOF;
 
 literal : Bool | Byte | Short | Int | Long | Float | Double | String | selector;
@@ -37,7 +39,8 @@ String : '"' ((ESCAPE | ~["\r\n])*) '"';
 unquotedString: UnquotedString
               | numericalValue
               | Id
-              | numericalRange;
+              | numericalRange
+              | keyword;
 
 decimal: Decimal | Int;
 
