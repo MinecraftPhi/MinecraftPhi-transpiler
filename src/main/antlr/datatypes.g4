@@ -10,10 +10,13 @@ selector : SelectorType ('[' selectorOptions ']')?;
 
 selectorOptions: selectorOption (',' selectorOption)*;
 
-selectorOption: ('x' | 'y' | 'z' | 'distance' | 'dx' | 'dy' | 'dz' ) '='  numericalRange
-              | ('tag' | 'team') '=' unquotedString
-              | 'name' '=' (String | unquotedString)
-              | 'limit' '=' Int;
+selectorOption: rangeSelectorOption '='  numericalRange
+              | unquotedSelectorOption '=' unquotedString
+              | quotedSelectorOption '=' (String | unquotedString)
+              | intSelectorOption '=' Int
+              | 'sort' '=' sortSelectorOption
+              | 'gamemode' '=' gamemodeSelectorOption
+              ;
 
 
 numericalRange: Range | decimal;

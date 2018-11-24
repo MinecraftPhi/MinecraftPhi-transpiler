@@ -14,26 +14,11 @@ assignment : '=' expression;
 
 expression : literal;
 
-rttype : 'byte'
-     | 'short'
-     | 'int'
-     | 'long'
-     | 'float'
-     | 'double'
-     | 'compound'
-     | 'list' '<' rttype '>'
-     | 'bool'
-     | 'score'
-     | 'string';
+rttype : simple_rttype
+     | 'list' '<' rttype '>';
 
-cttype : 'token'
-       | 'path'
-       | 'command'
-       | 'function'
-       | 'selector'
-       | 'intrange'
-       | 'doublerange'
-       | 'list' '<' cttype '>'
+cttype : 'list' '<' cttype '>'
+       | simple_cttype
        | rttype;
 
 EOL: ('\r'? '\n')+;
