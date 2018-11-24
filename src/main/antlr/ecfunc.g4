@@ -10,9 +10,11 @@ file : EOL? lines EOL? EOF;
 
 lines: line (EOL line)*;
 
+p : 'p';
+
 line: constant;
 
-constant : 'let' KEYWORD ':' cttype assignment? ';';
+constant : 'let' Id ':' cttype assignment? ';';
 
 assignment : '=' expression;
 
@@ -40,7 +42,5 @@ cttype : 'token'
        | 'list' '<' cttype '>'
        | rttype;
 
-
-KEYWORD : [a-zA-Z_] [0-9a-zA-Z_-]*;
 EOL: ('\r'? '\n')+;
 WS: (' ' | '\t')+ -> skip;

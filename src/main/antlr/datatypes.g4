@@ -8,13 +8,13 @@ selector : SelectorType ('[' selectorOptions ']')?;
 
 selectorOptions: selectorOption (',' selectorOption)*;
 
-selectorOption:
-    ('x' | 'y' | 'z' | 'distance' | 'dx' | 'dy' | 'dz' ) '='  numericalRange |
-    ('tag' | 'team') '=' unquotedString |
-    'limit' '=' Int;
+selectorOption: ('x' | 'y' | 'z' | 'distance' | 'dx' | 'dy' | 'dz' ) '='  numericalRange
+              | ('tag' | 'team') '=' unquotedString
+              | 'limit' '=' Int;
 
 
-numericalRange: decimal ('..' decimal?)? | '..' decimal?;
+numericalRange: Range | decimal;
+numericalValue: Bool | Byte | Short | Long | Int | Float | Double;
 
 SelectorType : '@' [apres];
 
@@ -30,16 +30,20 @@ Float : DECIMAL F;
 Double : DECIMAL D;
 Decimal : DECIMAL;
 
+Range: DECIMAL '..' DECIMAL? | '..' DECIMAL;
+
 String : '"' ((ESCAPE | ~["\r\n])*) '"';
 
-unquotedStringPart: InUnquotedString
-                | Bool | Byte | Short | Int | Long | Float | Double;
+unquotedString: UnquotedString
+              | numericalValue
+              | Id
+              | numericalRange;
 
 decimal: Decimal | Int;
-unquotedString: unquotedStringPart+ ;
 
 
-InUnquotedString: [0-9a-zA-Z_-] | '+' | '.';
+Id : [a-zA-Z_] [0-9a-zA-Z_-]*;
+UnquotedString: ([0-9a-zA-Z_-] | '+' | '.')+;
 fragment DIGITS : [0-9]+;
 fragment HEX_DIGIT : [0-9a-fA-F];
 fragment SIGN : [+-];
