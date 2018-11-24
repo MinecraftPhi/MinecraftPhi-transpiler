@@ -12,6 +12,7 @@ selectorOptions: selectorOption (',' selectorOption)*;
 
 selectorOption: ('x' | 'y' | 'z' | 'distance' | 'dx' | 'dy' | 'dz' ) '='  numericalRange
               | ('tag' | 'team') '=' unquotedString
+              | 'name' '=' (String | unquotedString)
               | 'limit' '=' Int;
 
 

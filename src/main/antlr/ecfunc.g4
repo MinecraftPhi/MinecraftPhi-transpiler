@@ -10,8 +10,6 @@ file : EOL? lines EOL? EOF;
 
 lines: line (EOL line)*;
 
-p : 'p';
-
 line: constant;
 
 constant : 'let' Id ':' cttype assignment? ';';

@@ -10,4 +10,6 @@ keyword:
     | 'x' | 'y' | 'z' | 'distance' | 'dx' | 'dy' | 'dz'
     | 'tag' | 'team'
     | 'limit'
+    | 'sort' | 'nearest' | 'furthest' | 'random' | 'arbitrary'
+    | 'gamemode' | 'survival' | 'creative' | 'adventure' | 'spectator'
     ;
