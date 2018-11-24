@@ -16,3 +16,8 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     antlr "org.antlr:antlr4:4.5"
 }
+
+generateGrammarSource {
+    arguments += ["-package", "ensconcer.transpiler.parser"]
+    outputDirectory = file("build/generated-src/antlr/main/ensconcer/transpiler/parser")
+}

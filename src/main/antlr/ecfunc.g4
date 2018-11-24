@@ -2,11 +2,7 @@ grammar ecfunc;
 
 import datatypes;
 
-@header {
-package ensconcer.transpiler.parser;
-}
-
-file : EOL? lines EOL? EOF;
+file : EOL? lines? EOL? EOF;
 
 lines: line (EOL line)*;
 
