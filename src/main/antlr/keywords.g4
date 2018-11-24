@@ -2,7 +2,7 @@ grammar keywords;
 
 keyword:
     //ensconcer specific
-     'let' | 'var' | 'list' | simple_cttype | 'return' | 'break'
+     'let' | 'var' | 'list' | simple_cttype | scorelike_type | 'return' | 'break'
 
     //selector
     | rangeSelectorOption
@@ -23,15 +23,17 @@ simple_cttype : 'token'
               | simple_rttype
               ;
 
-simple_rttype : 'byte'
-              | 'short'
-              | 'int'
-              | 'long'
+scorelike_type :  'byte'
+          | 'short'
+          | 'int'
+          | 'bool'
+          | 'score'
+          ;
+
+simple_rttype : 'long'
               | 'float'
               | 'double'
               | 'compound'
-              | 'bool'
-              | 'score'
               | 'string'
               ;
 
