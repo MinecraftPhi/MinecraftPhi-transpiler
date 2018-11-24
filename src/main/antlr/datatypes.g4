@@ -2,21 +2,24 @@ grammar datatypes;
 
 import keywords;
 
-test: literal (('\r'? '\n')+ literal)* ('\r'? '\n')* EOF;
+test: literal (('\r'? '\n')+ literal)* ('\r'? '\n')* ('//' | EOF);
 
 literal : Bool | Byte | Short | Int | Long | Float | Double | String | selector;
 
-selector : SelectorType ('[' selectorOptions ']')?;
+selector : SelectorType ('[' selectorOptions? ']')?;
 
 selectorOptions: selectorOption (',' selectorOption)*;
 
-selectorOption: ('x' | 'y' | 'z' | 'distance' | 'dx' | 'dy' | 'dz' ) '='  numericalRange
-              | ('tag' | 'team') '=' unquotedString
-              | 'name' '=' (String | unquotedString)
-              | 'limit' '=' Int;
+selectorOption: ( 'distance' | 'level' | 'x_rotation' | 'y_rotation' ) '='  numericalRange
+              | ('tag' | 'team') '=' '!'? unquotedString
+              | 'name' '=' '!'? (String | unquotedString)
+              | ('x' | 'y' | 'z' | 'dx' | 'dy' | 'dz' | 'limit') '=' Int
+              | 'scores' '=' selectorScores
+              | 'gamemode' '=' '!'? ('survival' | 'creative' | 'adventure' | 'spectator')
+              | 'type' '=' '!'? shortEntityTypes;
 
 
-numericalRange: Range | decimal;
+numericalRange: Range | Int;
 numericalValue: Bool | Byte | Short | Long | Int | Float | Double;
 
 SelectorType : '@' [apres];
@@ -31,19 +34,19 @@ Int : WHOLE_NUMBER;
 
 Float : DECIMAL F;
 Double : DECIMAL D;
-Decimal : DECIMAL;
 
-Range: DECIMAL '..' DECIMAL? | '..' DECIMAL;
+Range: WHOLE_NUMBER '..' WHOLE_NUMBER? | '..' WHOLE_NUMBER;
+
 
 String : '"' ((ESCAPE | ~["\r\n])*) '"';
 
+selectorScore: unquotedString '=' numericalRange;
+selectorScores: '{' (selectorScore (',' selectorScore)*)? '}';
 unquotedString: UnquotedString
               | numericalValue
               | Id
               | numericalRange
               | keyword;
-
-decimal: Decimal | Int;
 
 
 Id : [a-zA-Z_] [0-9a-zA-Z_-]*;
