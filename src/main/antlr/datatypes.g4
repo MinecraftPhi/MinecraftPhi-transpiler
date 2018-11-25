@@ -2,7 +2,7 @@ grammar datatypes;
 
 import keywords;
 
-test: literal (('\r'? '\n')+ literal)* ('\r'? '\n')* ('//' | EOF);
+//test: literal (('\r'? '\n')+ literal)* ('\r'? '\n')* ('//' | EOF);
 
 literal : Bool | Byte | Short | Int | Long | Float | Double | String | selector;
 

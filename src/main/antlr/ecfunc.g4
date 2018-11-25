@@ -2,13 +2,17 @@ grammar ecfunc;
 
 import datatypes;
 
-file : EOL? lines? EOL? EOF;
+file : (line? EOL)* line? EOF;
 
-lines : line (EOL line)*;
+line : constant
+     | functionDefinition;
 
-line : constant;
+constant : 'let' cttypeDefinition assignment? ';';
 
-constant : 'let' Id ':' cttype assignment? ';';
+functionDefinition: 'function' Id '(' (rttypeDefinition (',' rttypeDefinition)*)? ')' (':' rttype)? '{' '}';
+
+rttypeDefinition : Id (':' rttype)?;
+cttypeDefinition : Id ':' cttype;
 
 assignment : '=' expression;
 
@@ -24,7 +28,7 @@ cttype : 'list' '<' cttype '>'
        | rttype
        ;
 
-EOL: ('\r'? '\n')+;
+EOL: '\r'? '\n';
 WS: (' ' | '\t')+ -> skip;
 
 COMMENT: '#' .*? '\r'? '\n' -> channel(HIDDEN);
