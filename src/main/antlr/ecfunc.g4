@@ -42,3 +42,6 @@ cttype : 'token'
 
 EOL: ('\r'? '\n')+;
 WS: (' ' | '\t')+ -> skip;
+
+COMMENT: '#' .*? '\r'? '\n' -> channel(HIDDEN);
+
