@@ -17,6 +17,13 @@ selectorOption: ( 'distance' | 'level' | 'x_rotation' | 'y_rotation' ) '='  nume
               | 'scores' '=' selectorScores
               | 'gamemode' '=' '!'? ('survival' | 'creative' | 'adventure' | 'spectator')
               | 'type' '=' '!'? shortEntityTypes;
+selectorOption: rangeSelectorOption '='  numericalRange
+              | unquotedSelectorOption '=' unquotedString
+              | quotedSelectorOption '=' (String | unquotedString)
+              | intSelectorOption '=' Int
+              | 'sort' '=' sortSelectorOption
+              | 'gamemode' '=' gamemodeSelectorOption
+              ;
 
 
 numericalRange: Range | Int;

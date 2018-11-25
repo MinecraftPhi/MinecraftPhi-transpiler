@@ -2,15 +2,11 @@ grammar ecfunc;
 
 import datatypes;
 
-@header {
-package ensconcer.transpiler.parser;
-}
+file : EOL? lines? EOL? EOF;
 
-file : EOL? lines EOL? EOF;
+lines : line (EOL line)*;
 
-lines: line (EOL line)*;
-
-line: constant;
+line : constant;
 
 constant : 'let' Id ':' cttype assignment? ';';
 
@@ -18,27 +14,15 @@ assignment : '=' expression;
 
 expression : literal;
 
-rttype : 'byte'
-     | 'short'
-     | 'int'
-     | 'long'
-     | 'float'
-     | 'double'
-     | 'compound'
-     | 'list' '<' rttype '>'
-     | 'bool'
-     | 'score'
-     | 'string';
+rttype : simple_rttype
+       | 'list' '<' rttype '>'
+       | scorelike_type ('(' Range ')')?
+       ;
 
-cttype : 'token'
-       | 'path'
-       | 'command'
-       | 'function'
-       | 'selector'
-       | 'intrange'
-       | 'doublerange'
-       | 'list' '<' cttype '>'
-       | rttype;
+cttype : 'list' '<' cttype '>'
+       | simple_cttype
+       | rttype
+       ;
 
 EOL: ('\r'? '\n')+;
 WS: (' ' | '\t')+ -> skip;
