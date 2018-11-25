@@ -11,6 +11,7 @@ keyword:
     | intSelectorOption
     | 'sort' | sortSelectorOption
     | 'gamemode' | gamemodeSelectorOption
+    | 'type' | shortEntityTypes
     ;
 
 simple_cttype : 'token'
@@ -37,13 +38,13 @@ simple_rttype : 'long'
               | 'string'
               ;
 
-rangeSelectorOption : 'x' | 'y' | 'z' | 'distance' | 'dx' | 'dy' | 'dz';
+rangeSelectorOption : 'distance' | 'level' | 'x_rotation' | 'y_rotation';
 
 unquotedSelectorOption : 'tag' | 'team';
 
 quotedSelectorOption : 'name';
 
-intSelectorOption : 'limit';
+intSelectorOption : 'x' | 'y' | 'z' | 'dx' | 'dy' | 'dz' | 'limit';
 
 sortSelectorOption : 'nearest' | 'furthest' | 'random' | 'arbitrary';
 

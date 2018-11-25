@@ -10,19 +10,14 @@ selector : SelectorType ('[' selectorOptions? ']')?;
 
 selectorOptions: selectorOption (',' selectorOption)*;
 
-selectorOption: ( 'distance' | 'level' | 'x_rotation' | 'y_rotation' ) '='  numericalRange
-              | ('tag' | 'team') '=' '!'? unquotedString
-              | 'name' '=' '!'? (String | unquotedString)
-              | ('x' | 'y' | 'z' | 'dx' | 'dy' | 'dz' | 'limit') '=' Int
-              | 'scores' '=' selectorScores
-              | 'gamemode' '=' '!'? ('survival' | 'creative' | 'adventure' | 'spectator')
-              | 'type' '=' '!'? shortEntityTypes;
 selectorOption: rangeSelectorOption '='  numericalRange
-              | unquotedSelectorOption '=' unquotedString
-              | quotedSelectorOption '=' (String | unquotedString)
-              | intSelectorOption '=' Int
+              | unquotedSelectorOption '=' '!'? unquotedString
+              | quotedSelectorOption '=' '!'? (String | unquotedString)
+              | intSelectorOption '=' '!'? Int
               | 'sort' '=' sortSelectorOption
-              | 'gamemode' '=' gamemodeSelectorOption
+              | 'gamemode' '=' '!'? gamemodeSelectorOption
+              | 'type' '=' '!'? shortEntityTypes
+              | 'scores' '=' scoresSelectorOption
               ;
 
 
@@ -48,7 +43,7 @@ Range: WHOLE_NUMBER '..' WHOLE_NUMBER? | '..' WHOLE_NUMBER;
 String : '"' ((ESCAPE | ~["\r\n])*) '"';
 
 selectorScore: unquotedString '=' numericalRange;
-selectorScores: '{' (selectorScore (',' selectorScore)*)? '}';
+scoresSelectorOption: '{' (selectorScore (',' selectorScore)*)? '}';
 unquotedString: UnquotedString
               | numericalValue
               | Id
