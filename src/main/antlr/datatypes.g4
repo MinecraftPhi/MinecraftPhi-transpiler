@@ -2,20 +2,22 @@ grammar datatypes;
 
 import keywords;
 
-test: literal (('\r'? '\n')+ literal)* ('\r'? '\n')* EOF;
+test: literal (('\r'? '\n')+ literal)* ('\r'? '\n')* ('//' | EOF);
 
 literal : numericalValue | String | selector;
 
-selector : SelectorType ('[' selectorOptions ']')?;
+selector : SelectorType ('[' selectorOptions? ']')?;
 
 selectorOptions: selectorOption (',' selectorOption)*;
 
 selectorOption: rangeSelectorOption '='  numericalRange
-              | unquotedSelectorOption '=' unquotedString
-              | quotedSelectorOption '=' (String | unquotedString)
-              | intSelectorOption '=' Int
+              | unquotedSelectorOption '=' '!'? unquotedString
+              | quotedSelectorOption '=' '!'? (String | unquotedString)
+              | intSelectorOption '=' '!'? Int
               | 'sort' '=' sortSelectorOption
-              | 'gamemode' '=' gamemodeSelectorOption
+              | 'gamemode' '=' '!'? gamemodeSelectorOption
+              | 'type' '=' '!'? shortEntityTypes
+              | 'scores' '=' scoresSelectorOption
               ;
 
 
@@ -35,9 +37,9 @@ Int : WHOLE_NUMBER;
 
 Float : DECIMAL F;
 Double : DECIMAL D;
-Decimal : DECIMAL;
 
-Range: DECIMAL '..' DECIMAL? | '..' DECIMAL;
+Range: WHOLE_NUMBER '..' WHOLE_NUMBER? | '..' WHOLE_NUMBER;
+
 
 String : '"' ((ESCAPE | ~["\r\n])*) '"';
 
@@ -55,6 +57,8 @@ unquotedString: ( Character
 decimal: Decimal | Int;
 
 Sign: [+-];
+selectorScore: unquotedString '=' numericalRange;
+scoresSelectorOption: '{' (selectorScore (',' selectorScore)*)? '}';
 
 Id : [a-zA-Z_] [0-9a-zA-Z_-]*;
 Character : [0-9a-zA-Z_];
