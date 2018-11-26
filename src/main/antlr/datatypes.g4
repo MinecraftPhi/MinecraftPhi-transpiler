@@ -4,7 +4,7 @@ import keywords;
 
 //test: literal (('\r'? '\n')+ literal)* ('\r'? '\n')* ('//' | EOF);
 
-literal : Bool | Byte | Short | Int | Long | Float | Double | String | selector;
+literal : numericalValue | String | selector;
 
 selector : SelectorType ('[' selectorOptions? ']')?;
 
@@ -21,8 +21,9 @@ selectorOption: rangeSelectorOption '='  numericalRange
               ;
 
 
-numericalRange: Range | Int;
-numericalValue: Bool | Byte | Short | Long | Int | Float | Double;
+numericalRange: Range | decimal;
+numericalValue: Bool | SIGN? unsignedNumericalValue;
+unsignedNumericalValue : Byte | Short | Long | Int | Float | Double;
 
 SelectorType : '@' [apres];
 
@@ -42,25 +43,32 @@ Range: WHOLE_NUMBER '..' WHOLE_NUMBER? | '..' WHOLE_NUMBER;
 
 String : '"' ((ESCAPE | ~["\r\n])*) '"';
 
+// TODO: Check for whitespace
+unquotedString: ( Character
+                | Sign
+                | '.'
+                | numericalValue
+                | Id
+                | numericalRange
+                | keyword
+                )+
+                ;
+
+decimal: Decimal | Int;
+
+Sign: [+-];
 selectorScore: unquotedString '=' numericalRange;
 scoresSelectorOption: '{' (selectorScore (',' selectorScore)*)? '}';
-unquotedString: UnquotedString
-              | numericalValue
-              | Id
-              | numericalRange
-              | keyword;
-
 
 Id : [a-zA-Z_] [0-9a-zA-Z_-]*;
-UnquotedString: ([0-9a-zA-Z_-] | '+' | '.')+;
+Character : [0-9a-zA-Z_];
 fragment DIGITS : [0-9]+;
 fragment HEX_DIGIT : [0-9a-fA-F];
-fragment SIGN : [+-];
-fragment INTEGER_PART : SIGN? DIGITS;
+fragment INTEGER_PART : DIGITS;
 fragment FRACTIONAL_PART : '.' DIGITS;
 fragment WHOLE_NUMBER : INTEGER_PART;
-fragment DECIMAL : SIGN? INTEGER_PART FRACTIONAL_PART?
-                 | SIGN? FRACTIONAL_PART;
+fragment DECIMAL : INTEGER_PART FRACTIONAL_PART?
+                 | FRACTIONAL_PART;
 fragment ESCAPE : '\\' [n\\"]
                 | '\\u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT;
 
