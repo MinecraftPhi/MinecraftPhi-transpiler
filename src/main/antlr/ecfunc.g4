@@ -1,72 +1,68 @@
-grammar ecfunc;
+parser grammar ecfunc;
 
 import datatypes;
 
+options{
+    tokenVocab = generalLexer;
+}
+
+
 file : (line? EOL)* line? EOF;
 
-line : constant
-     | functionDefinition;
+line : constant;
+     //| functionDefinition;
 
-constant : 'let' cttypeDefinition constAssign? ';';
-constAssign : '=' (numericalConstExpression | booleanConstExpression | literal);
+constant : LET cttypeDefinition constAssign? END_STATEMENT;
+constAssign : Assign (numericalConstExpression | booleanConstExpression | literal);
 
-functionDefinition: 'function' Id '(' (rttypeDefinition (',' rttypeDefinition)*)? ')' (':' rttype)? '{' '}';
+//functionDefinition: FUNCTION Id '(' (rttypeDefinition (',' rttypeDefinition)*)? ')' (':' rttype)? '{' '}';
 
-rttypeDefinition : Id (':' rttype)?;
-cttypeDefinition : Id ':' cttype;
+rttypeDefinition : Id (TypeDefine rttype)?;
+cttypeDefinition : Id TypeDefine cttype;
 
-numericalConstExpression :<assoc=right> numericalConstExpression '**' numericalConstExpression     #constExponent
-                         | constUnaryOp                                                            #constUnary
-                         | numericalConstExpression op=('*' | '/' | '%') numericalConstExpression  #constBinOp
-                         | numericalConstExpression op=('+' | '-') numericalConstExpression        #constBinOp
-                         | numericalConstExpression shiftOp numericalConstExpression               #constShift
-                         | numericalConstExpression op='&' numericalConstExpression                #constBinOp
-                         | numericalConstExpression op='^' numericalConstExpression                #constBinOp
-                         | numericalConstExpression op='|' numericalConstExpression                #constBinOp
-                         | numericConstValue                                                       #constValue
+numericalConstExpression :<assoc=right> numericalConstExpression Pow numericalConstExpression        #constExponent
+                         | constUnaryOp                                                              #constUnary
+                         | numericalConstExpression op=( Mul | Div | Mod ) numericalConstExpression  #constBinOp
+                         | numericalConstExpression op=( Add | Min ) numericalConstExpression        #constBinOp
+                         | numericalConstExpression op=( LeftShift
+                                                       | ArithmicRightShift
+                                                       | LogicalRightShift) numericalConstExpression #constBinOp
+                         | numericalConstExpression op=BitAnd numericalConstExpression               #constBinOp
+                         | numericalConstExpression op=BitXor numericalConstExpression               #constBinOp
+                         | numericalConstExpression op=BitOr  numericalConstExpression               #constBinOp
                          ;
 
-constUnaryOp : op+='-' (op+='~')? numericConstValue
-             | op+='~' (op+='-')? numericConstValue
+constUnaryOp : numericConstValue
+             | op=Min    numericConstValue
+             | op=BitNot numericConstValue
              ;
 
-shiftOp : // these are split into multiple tokens so that the parts can still be matched by the lexer for templates
-          // TODO: check for whitespace
-          '<' '<'     #leftShift
-        | '>' '>'     #arithRightShift
-        | '>' '>' '>' #logicalRightShift
-        ;
 
-numericConstValue : unsignedNumericalValue
-            | '(' numericalConstExpression ')'
-            ;
+numericConstValue : numericalValue
+                  | RoundBOpen numericalConstExpression RoundBClose
+                  ;
 
-booleanConstExpression : '!' booleanConstExpression                                                      #constNot
-                       | numericalConstExpression cmp=('<' | '<=' | '>' | '>=') numericalConstExpression #constCmp
-                       | numericalConstExpression ( cmp=('==' | '!==') numericalConstExpression
-                                                  | cmp='matches' numericalRange
+booleanConstExpression : LogNot booleanConstExpression                                                      #constNot
+                       | numericalConstExpression cmp=(LessThan | LessEqual | MoreThan | MoreEqual) numericalConstExpression #constCmp
+                       | numericalConstExpression ( cmp=(Equals | NotEquals) numericalConstExpression
+                                                  | cmp=Matches /*numericalRange*/
                                                   )                                                      #constCmp
-                       | booleanConstExpression '&&' booleanConstExpression                              #constLogicalAnd
-                       | booleanConstExpression '||' booleanConstExpression                              #constLogicalOr
+                       | booleanConstExpression LogAnd booleanConstExpression                              #constLogicalAnd
+                       | booleanConstExpression LogOr  booleanConstExpression                              #constLogicalOr
                        | booleanConstValue                                                               #constBool
                        ;
 
-booleanConstValue : Bool
-                  | '(' booleanConstExpression ')'
+booleanConstValue : /*Bool
+                  | */ RoundBOpen booleanConstExpression RoundBClose
                   ;
 
 rttype : simple_rttype
-       | 'list' '<' rttype '>'
-       | scorelike_type ('(' Range ')')?
+       | LIST ListOpen rttype ListClose
+       | scorelike_type (RangeOpen range RangeClose)?
        ;
 
-cttype : 'list' '<' cttype '>'
+cttype : rttype
+       | LIST ListOpen cttype ListClose
        | simple_cttype
-       | rttype
        ;
-
-EOL: '\r'? '\n';
-WS: (' ' | '\t')+ -> skip;
-
-COMMENT: '#' .*? '\r'? '\n' -> channel(HIDDEN);
 

@@ -1,5 +1,9 @@
-grammar keywords;
+parser grammar keywords;
 
+options{
+    tokenVocab = generalLexer;
+}
+/*
 keyword:
     //ensconcer specific
      'let' | 'var' | 'list' | simple_cttype | scorelike_type | 'return' | 'break'
@@ -13,43 +17,46 @@ keyword:
     | 'gamemode' | gamemodeSelectorOption
     | 'type' | shortEntityTypes
     ;
+*/
 
-simple_cttype : 'token'
-              | 'path'
-              | 'command'
-              | 'function'
-              | 'selector'
-              | 'intrange'
-              | 'doublerange'
+t: LET simple_cttype;
+
+simple_cttype : TOKEN
+              | PATH
+              | COMMAND
+              | FUCNTION
+              | SELECTOR
+              | INTRANGE
+              | DOUBLERANGE
               | simple_rttype
               ;
 
-scorelike_type :  'byte'
-          | 'short'
-          | 'int'
-          | 'bool'
-          | 'score'
-          ;
+scorelike_type : BYTE
+               | SHORT
+               | INT
+               | BOOL
+               | SCORE
+               ;
 
-simple_rttype : 'long'
-              | 'float'
-              | 'double'
-              | 'compound'
-              | 'string'
+simple_rttype : LONG
+              | FLOAT
+              | DOUBLE
+              | COMPOUND
+              | STRING
               ;
 
-rangeSelectorOption : 'distance' | 'level' | 'x_rotation' | 'y_rotation';
+rangeSelectorOption : DISTANCE | LEVEL | X_ROTATION | Y_ROTATION;
 
-unquotedSelectorOption : 'tag' | 'team';
+unquotedSelectorOption : TAG | TEAM;
 
-quotedSelectorOption : 'name';
+quotedSelectorOption : NAME;
 
-intSelectorOption : 'x' | 'y' | 'z' | 'dx' | 'dy' | 'dz' | 'limit';
+intSelectorOption : X | Y | Z | DX | DY | DZ | LIMIT ;
 
-sortSelectorOption : 'nearest' | 'furthest' | 'random' | 'arbitrary';
+sortSelectorOption : ;
 
-gamemodeSelectorOption : 'survival' | 'creative' | 'adventure' | 'spectator';
-
+gamemodeSelectorOption : SURVIVAL | CREATIVE | ADVENTURE | SPECTATOR;
+/*
 entityTypes : ('minecraft' ':')? shortEntityTypes;
 
 shortEntityTypes :
@@ -144,4 +151,4 @@ shortEntityTypes :
             | 'tnt'
             | 'falling_block'
             | 'item'
-            | 'experience_orb';
+            | 'experience_orb';*/
