@@ -7,7 +7,7 @@ options{
 }
 
 
-file : (line? EOL)* line? EOF;
+file : line? (EOL+ line)* EOL* EOF;
 
 line : constant
      | functionDefinition;

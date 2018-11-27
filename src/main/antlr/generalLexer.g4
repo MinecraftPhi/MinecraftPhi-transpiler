@@ -18,7 +18,7 @@ END_STATEMENT: ';';
 WS: (' ' | '\t')+ -> channel(WS_CHANNEL);
 
 mode COMMENT_MODE;
-CM_EOL: EOL    -> type(EOL), popMode;
+CM_EOL: EOL    -> type(EOL), mode(DEFAULT_MODE);
 COMMENT_TEXT: ~[\r\n]+ -> channel(COMMENT_CHANNEL);
 
 mode FUNCTION_DEFINITION_MODE;
