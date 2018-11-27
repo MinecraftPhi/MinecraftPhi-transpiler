@@ -23,6 +23,15 @@ COMMENT_TEXT: ~[\r\n]+ -> channel(COMMENT_CHANNEL);
 
 mode FUNCTION_DEFINITION_MODE;
 FDM_EOL: EOL -> type(EOL);
+FDM_RoundBOpen : RoundBOpen  -> type(RoundBOpen) ;
+FDM_RoundBClose: RoundBClose -> type(RoundBClose);
+
+FDM_Id: Id -> type(Id);
+FDM_TypeDefine : TypeDefine  -> type(TypeDefine), pushMode(TYPE_MATCH_MODE);
+ParamSeparator : ',';
+
+FunctionBodyOpen : '{';
+FunctionBodyClose: '}' -> mode(DEFAULT_MODE);
 
 WS_FDM: (' ' | '\t')+ -> channel(WS_CHANNEL);
 
@@ -50,8 +59,8 @@ STRING      : 'string';
 LIST        : 'list';
 ListOpen    : '<';
 ListClose   : '>';
-RangeOpen   : '(' -> pushMode(MATCH_RANGE_MODE), pushMode(VOID_SPACE_MODE);
-RangeClose  : ')';
+RangeOpen   : RoundBOpen  -> type(RoundBOpen) , pushMode(MATCH_RANGE_MODE), pushMode(VOID_SPACE_MODE);
+RangeClose  : RoundBClose -> type(RoundBClose);
 
 END: {} -> skip, popMode;
 

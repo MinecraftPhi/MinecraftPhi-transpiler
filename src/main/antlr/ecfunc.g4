@@ -9,13 +9,13 @@ options{
 
 file : (line? EOL)* line? EOF;
 
-line : constant;
-     //| functionDefinition;
+line : constant
+     | functionDefinition;
 
 constant : LET cttypeDefinition constAssign? END_STATEMENT;
 constAssign : Assign (numericalConstExpression | booleanConstExpression | literal);
 
-//functionDefinition: FUNCTION Id '(' (rttypeDefinition (',' rttypeDefinition)*)? ')' (':' rttype)? '{' '}';
+functionDefinition: FUNCTION Id RoundBOpen (rttypeDefinition (ParamSeparator rttypeDefinition)*)? RoundBClose (TypeDefine rttype)? FunctionBodyOpen FunctionBodyClose;
 
 rttypeDefinition : Id (TypeDefine rttype)?;
 cttypeDefinition : Id TypeDefine cttype;
@@ -58,7 +58,7 @@ booleanConstValue : /*Bool
 
 rttype : simple_rttype
        | LIST ListOpen rttype ListClose
-       | scorelike_type (RangeOpen range RangeClose)?
+       | scorelike_type (RoundBOpen range RoundBClose)?
        ;
 
 cttype : rttype

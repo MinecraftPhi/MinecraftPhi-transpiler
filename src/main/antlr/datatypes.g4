@@ -20,7 +20,7 @@ numericalValue: s=(Sign|Min)? (Integer | Byte | Short | Long | Double | Float | 
 
 selector : SelectorType (SelectorOpen selectorOptions? SelectorClose)?;
 
-selectorOptions: selectorOption (',' selectorOption)*;
+selectorOptions: selectorOption (SelectorSeperator selectorOption)*;
 
 selectorOption: rangeSelectorOption Is  range
               | unquotedSelectorOption Is Not? UnquotedString
