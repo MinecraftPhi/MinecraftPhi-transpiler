@@ -1,10 +1,11 @@
 parser grammar ecfunc;
 
-import datatypes;
+import datatypes, commands;
 
 options{
     tokenVocab = generalLexer;
 }
+
 
 
 file : line? (EOL+ line)* EOL* EOF;
@@ -12,10 +13,17 @@ file : line? (EOL+ line)* EOL* EOF;
 line : constant
      | functionDefinition;
 
+
 constant : LET cttypeDefinition constAssign? END_STATEMENT;
 constAssign : Assign (numericalConstExpression | booleanConstExpression | literal);
 
-functionDefinition: FUNCTION Id RoundBOpen (rttypeDefinition (ParamSeparator rttypeDefinition)*)? RoundBClose (TypeDefine rttype)? FunctionBodyOpen FunctionBodyClose;
+functionDefinition: DEF Id
+                       ( AngleBOpen  cttypeDefinition (ParamSeparator cttypeDefinition)*   AngleBClose)?
+                         RoundBOpen (rttypeDefinition (ParamSeparator rttypeDefinition)*)? RoundBClose
+                       ( TypeDefine  rttype)?
+                         FunctionBodyOpen functionBody* FunctionBodyClose;
+
+functionBody: mcCommand | EOL;
 
 rttypeDefinition : Id (TypeDefine rttype)?;
 cttypeDefinition : Id TypeDefine cttype;
@@ -45,7 +53,7 @@ numericConstValue : numericalValue
 booleanConstExpression : LogNot booleanConstExpression                                                      #constNot
                        | numericalConstExpression cmp=(LessThan | LessEqual | MoreThan | MoreEqual) numericalConstExpression #constCmp
                        | numericalConstExpression ( cmp=(Equals | NotEquals) numericalConstExpression
-                                                  | cmp=Matches /*numericalRange*/
+                                                  | cmp=Matches range
                                                   )                                                      #constCmp
                        | booleanConstExpression LogAnd booleanConstExpression                              #constLogicalAnd
                        | booleanConstExpression LogOr  booleanConstExpression                              #constLogicalOr
@@ -57,12 +65,12 @@ booleanConstValue : /*Bool
                   ;
 
 rttype : simple_rttype
-       | LIST ListOpen rttype ListClose
+       | LIST AngleBOpen rttype AngleBClose
        | scorelike_type (RoundBOpen range RoundBClose)?
        ;
 
 cttype : rttype
-       | LIST ListOpen cttype ListClose
+       | LIST AngleBOpen cttype AngleBClose
        | simple_cttype
        ;
 

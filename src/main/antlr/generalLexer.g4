@@ -1,5 +1,6 @@
 lexer grammar generalLexer;
 
+
 channels {
         WS_CHANNEL,
         COMMENT_CHANNEL
@@ -9,9 +10,9 @@ channels {
 
 EOL: '\n' '\r'?;
 
-LET      : 'let'      -> mode(CONSTANT_DEFINITION_MODE);
-FUNCTION : 'function' -> mode(FUNCTION_DEFINITION_MODE);
-COMMENT  : '#'        -> mode(COMMENT_MODE), channel(COMMENT_CHANNEL);
+LET     : 'let'      -> mode(CONSTANT_DEFINITION_MODE);
+DEF     : 'function' -> mode(FUNCTION_DEFINITION_MODE);
+COMMENT : '#'        -> mode(COMMENT_MODE), channel(COMMENT_CHANNEL);
 
 END_STATEMENT: ';';
 
@@ -25,13 +26,14 @@ mode FUNCTION_DEFINITION_MODE;
 FDM_EOL: EOL -> type(EOL);
 FDM_RoundBOpen : RoundBOpen  -> type(RoundBOpen) ;
 FDM_RoundBClose: RoundBClose -> type(RoundBClose);
+AngleBOpen    : '<';
+AngleBClose   : '>';
 
 FDM_Id: Id -> type(Id);
 FDM_TypeDefine : TypeDefine  -> type(TypeDefine), pushMode(TYPE_MATCH_MODE);
 ParamSeparator : ',';
 
-FunctionBodyOpen : '{';
-FunctionBodyClose: '}' -> mode(DEFAULT_MODE);
+FunctionBodyOpen : '{' -> mode(DEFAULT_MODE), pushMode(FUNCTION_BODY_MODE);
 
 WS_FDM: (' ' | '\t')+ -> channel(WS_CHANNEL);
 
@@ -41,7 +43,7 @@ mode TYPE_MATCH_MODE;
 TOKEN       : 'token';
 PATH        : 'path';
 COMMAND     : 'command';
-FUCNTION    : 'function';
+TypeFUCNTION: 'function' -> type(FUNCTION);
 SELECTOR    : 'selector';
 INTRANGE    : 'intrange';
 DOUBLERANGE : 'doublerange';
@@ -56,9 +58,9 @@ DOUBLE      : 'double';
 COMPOUND    : 'compound';
 STRING      : 'string';
 
-LIST        : 'list';
-ListOpen    : '<';
-ListClose   : '>';
+TypeLIST    : 'list' -> type(LIST);
+ListOpen    : AngleBOpen  -> type(AngleBOpen) ;
+ListClose   : AngleBClose -> type(AngleBClose);
 RangeOpen   : RoundBOpen  -> type(RoundBOpen) , pushMode(MATCH_RANGE_MODE), pushMode(VOID_SPACE_MODE);
 RangeClose  : RoundBClose -> type(RoundBClose);
 
@@ -185,9 +187,9 @@ EM_END: END -> skip, popMode;
 mode SELECTOR_MODE;
 
 SelectorOpen      : '[';
-SelectorClose     : ']';
+SelectorClose     : ']' -> popMode;
 SelectorSeperator : ',';
-SelectorNameSpace : ':' ->pushMode(MATCH_UNQUOTED_STRING);
+SelectorNameSpace : ':' -> pushMode(MATCH_UNQUOTED_STRING);
 
 SM_Is : Is -> type(Is);
 Not       : LogNot;
@@ -198,8 +200,10 @@ LEVEL      : 'level'      -> pushMode(MATCH_RANGE_MODE),      pushMode(VOID_SPAC
 X_ROTATION : 'x_rotation' -> pushMode(MATCH_RANGE_MODE),      pushMode(VOID_SPACE_MODE);
 Y_ROTATION : 'y_rotation' -> pushMode(MATCH_RANGE_MODE),      pushMode(VOID_SPACE_MODE);
 
-TAG        : 'tag'        -> pushMode(MATCH_UNQUOTED_STRING), pushMode(VOID_SPACE_MODE);
-TEAM       : 'team'       -> pushMode(MATCH_UNQUOTED_STRING), pushMode(VOID_SPACE_MODE);
+SelTAG     : 'tag'        -> type(TAG),
+                             pushMode(MATCH_UNQUOTED_STRING), pushMode(VOID_SPACE_MODE);
+SelTEAM    : 'team'       -> type(TEAM),
+                             pushMode(MATCH_UNQUOTED_STRING), pushMode(VOID_SPACE_MODE);
 
 TYPE       : 'type'       -> pushMode(MATCH_ENTITY),          pushMode(VOID_SPACE_MODE);
 
@@ -213,7 +217,7 @@ FURTHEST   : 'furthest'  ;
 RANDOM     : 'random'    ;
 ARBITRARY  : 'arbitrary' ;
 
-GAMEMODE   : 'gamemode'  ;
+SelGAMEMODE: 'gamemode'   -> type(GAMEMODE);
 SURVIVAL   : 'survival'  ;
 CREATIVE   : 'creative'  ;
 ADVENTURE  : 'adventure' ;
@@ -241,21 +245,127 @@ ScoreSeperator : ',' -> pushMode(MATCH_RANGE_MODE),      pushMode(VOID_SPACE_MOD
                         pushMode(MATCH_UNQUOTED_STRING), pushMode(VOID_SPACE_MODE);
 CurlyClose     : '}' -> popMode;
 
+
+
+mode FUNCTION_BODY_MODE;
+ADVANCEMENT     : 'advancement'     -> pushMode(ADVANCEMENT_COMMAND_MODE), pushMode(MATCH_SPACE),
+                                       pushMode(MATCH_PLAYER_KEYWORD)    , pushMode(MATCH_SPACE),
+                                       pushMode(MATCH_COMMAND_KEYWORD)   , pushMode(MATCH_SPACE);
+BAN             : 'ban'             ;
+BOSSBAR         : 'bossbar'         ;
+CLEAR           : 'clear'           ;
+CLONE           : 'clone'           ;
+DATA            : 'data'            ;
+DATAPACK        : 'datapack'        ;
+DEBUG           : 'debug'           ;
+DEFAULTGAMEMODE : 'defaultgamemode' ;
+DEOP            : 'deop'            ;
+DIFFICULTY      : 'difficulty'      ;
+EFFECT          : 'effect'          ;
+ENCHANT         : 'enchant'         ;
+EXPERIENCE      : 'experience'      ;
+EXECUTE         : 'execute'         ;
+FILL            : 'fill'            ;
+FORCELOAD       : 'forceload'       ;
+FUNCTION        : 'function'        ;
+GAMEMODE        : 'gamemode'        ;
+GAMERULE        : 'gamerule'        ;
+GIVE            : 'give'            ;
+HELP            : 'help'            ;
+KICK            : 'kick'            ;
+KILL            : 'kill'            ;
+LIST            : 'list'            ;
+LOCATE          : 'locate'          ;
+ME              : 'me'              ;
+OP              : 'op'              ;
+PARDON          : 'pardon'          ;
+PARTICLE        : 'particle'        ;
+PLAYSOUND       : 'playsound'       ;
+PUBLISH         : 'publish'         ;
+RECIPE          : 'recipe'          ;
+RELOAD          : 'reload'          ;
+REPLACEITEM     : 'replaceitem'     ;
+SAVE            : 'save'            ;
+SAY             : 'say'             ;
+SCOREBOARD      : 'scoreboard'      ;
+SEED            : 'seed'            ;
+SETBLOCK        : 'setblock'        ;
+SETIDLETIMEOUT  : 'setidletimeout'  ;
+SETWORLDSPAWN   : 'setworldspawn'   ;
+SPAWNPOINT      : 'spawnpoint'      ;
+SPREADPLAYERS   : 'spreadplayers'   ;
+STOP            : 'stop'            ;
+STOPSOUND       : 'stopsound'       ;
+SUMMON          : 'summon'          ;
+TAG             : 'tag'             ;
+TEAM            : 'team'            ;
+TELEPORT        : 'teleport'        ;
+TELL            : 'tell'            ;
+TELLRAW         : 'tellraw'         ;
+TIME            : 'time'            ;
+TITLE           : 'title'           ;
+TP              : 'tp'              ;
+TRIGGER         : 'trigger'         ;
+WEATHER         : 'weather'         ;
+WHITELIST       : 'whitelist'       ;
+WORLDBORDER     : 'worldborder'     ;
+
+FunctionBodyClose: '}' -> popMode;
+
+FBM_SM : WS  -> channel(WS_CHANNEL);
+FBM_EOL: EOL -> type(EOL);
+
+mode MATCH_COMMAND_KEYWORD;
+MCgrant  : 'grant'  -> popMode;
+MCrevoke : 'revoke' -> popMode;
+
+mode ADVANCEMENT_COMMAND_MODE;
+ADVonly : 'only' -> mode(MATCH_GREEDY_STRING), pushMode(MATCH_SPACE_END),
+                    pushMode(MATCH_RESOURCE) , pushMode(MATCH_SPACE);
+ADVuft: ('until' | 'from' | 'through') -> mode(MATCH_RESOURCE), pushMode(MATCH_SPACE);
+ADVeverything: 'everything' -> popMode;
+
+mode MATCH_PLAYER_KEYWORD;
+Selector   : SelectorType -> type(SelectorType), mode(SELECTOR_MODE);
+PlayerName : PN PN PN (PN PN PN PN PN PN)? (PN PN PN PN)? (PN PN)? PN?;
+
+fragment PN: [a-zA-Z0-9];
+
 mode MATCH_ENTITY;
 ME_US: UnquotedString -> type(UnquotedString), popMode;
 NS: ':';
 ME_END: END -> skip, popMode;
 
+
 mode MATCH_UNQUOTED_STRING;
 UnquotedString: [a-zA-Z0-9_\-+.]+ -> popMode;
+
 
 mode MATCH_GENERAL_STRING;
 MGS_US: UnquotedString -> type(UnquotedString), popMode;
 MGS_QS: String -> type(String), popMode;
 
+mode MATCH_GREEDY_STRING;
+GREEDY_STRING: ~[\n\r]+ -> popMode;
+MGS_END: END -> skip, popMode;
+
+mode MATCH_RESOURCE;
+NSSeperator: ':';
+NameSpace  : [0-9a-z_.-]+ ;
+Path       : [0-9a-z_/.-]+;
+
+MR_END: END -> skip, popMode;
+
 mode VOID_SPACE_MODE;
 Is: '=';
 WS_Not: Not -> type(Not);
-
 WS_VSM: WS -> channel(WS_CHANNEL);
 VSM_END: END -> skip, popMode;
+
+
+mode MATCH_SPACE;
+SPACE        : ' '+ -> channel(WS_CHANNEL), popMode;
+
+mode MATCH_SPACE_END;
+MSE_SPACE    : ' '+ -> channel(WS_CHANNEL), popMode;
+MSE_END      : END  -> skip, mode(FUNCTION_BODY_MODE);
