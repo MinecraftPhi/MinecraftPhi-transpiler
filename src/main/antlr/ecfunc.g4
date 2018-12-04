@@ -1,11 +1,10 @@
 parser grammar ecfunc;
 
-import datatypes, commands;
+import datatypes;
 
 options{
     tokenVocab = generalLexer;
 }
-
 
 
 file : line? (EOL+ line)* EOL* EOF;
@@ -15,15 +14,35 @@ line : constant
 
 
 constant : LET cttypeDefinition constAssign? END_STATEMENT;
-constAssign : Assign (numericalConstExpression | booleanConstExpression | literal);
+constAssign : Assign constExpression;
+
+constExpression: numericalConstExpression | booleanConstExpression | literal;
 
 functionDefinition: DEF Id
                        ( AngleBOpen  cttypeDefinition (ParamSeparator cttypeDefinition)*   AngleBClose)?
                          RoundBOpen (rttypeDefinition (ParamSeparator rttypeDefinition)*)? RoundBClose
                        ( TypeDefine  rttype)?
-                         FunctionBodyOpen functionBody* FunctionBodyClose;
+                         FunctionBodyOpen (functionBody? EOL)* FunctionBodyClose;
 
-functionBody: mcCommand | EOL;
+
+functionBody: mcCommand;
+
+mcCommand: MCCommand ( SPACE argument)*;
+
+argument : (Parameter
+           | selector
+           | nbt
+           | interpolation
+           | EscapeInterpolation
+           | NoEscape
+           | InterpolationClose
+           | NBTOpen
+           | At)*;
+
+
+interpolation: InterpolationOpen constExpression InterpolationClose;
+
+
 
 rttypeDefinition : Id (TypeDefine rttype)?;
 cttypeDefinition : Id TypeDefine cttype;
@@ -73,4 +92,3 @@ cttype : rttype
        | LIST AngleBOpen cttype AngleBClose
        | simple_cttype
        ;
-
