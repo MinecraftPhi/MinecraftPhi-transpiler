@@ -158,6 +158,8 @@ Decimal: DECIMAL;
 String : '"' ((ESCAPE | ~["\r\n])*) '"';
 SelectorType: '@' [apres] -> pushMode(SELECTOR_MODE);
 
+Shell : '`' -> pushMode(NESTED_COMMAND);
+
 fragment DIGITS : [0-9]+;
 fragment HEX_DIGIT : [0-9a-fA-F];
 fragment INTEGER_PART : DIGITS;
@@ -322,7 +324,7 @@ InterpolationClose:'}';
 NoEscape: '$';
 At: '@';
 
-CMDNBTOpen: NBTOpen -> type(NBTOpen), pushMode(MATCH_NBT);
+CMNBTOpen: NBTOpen -> type(NBTOpen), pushMode(MATCH_NBT);
 
 Parameter  : ~[ \n\r$}@]+;
 
@@ -330,6 +332,25 @@ Parameter  : ~[ \n\r$}@]+;
 SPACE      : ' '+;
 MC_EOL     : EOL  -> type(EOL), popMode;
 
+mode NESTED_COMMAND;
+NCCommand: MCCommand -> type(MCCommand), mode(NESTED_COMMAND_ARGS);
+NC_SM : WS  -> channel(WS_CHANNEL);
+
+mode NESTED_COMMAND_ARGS;
+NC_Selector: SelectorType -> type(SelectorType), pushMode(SELECTOR_MODE);
+NCEscapeInterpolation: EscapeInterpolation -> type(EscapeInterpolation);
+NCInterpolationOpen  : InterpolationOpen   -> type(InterpolationOpen)  , pushMode(EXPRESSION_MODE);
+NCInterpolationClose : InterpolationClose  -> type(InterpolationClose) ;
+NCNoEscape           : [$\\]               -> type(NoEscape)           ;
+NCAt                 : At                  -> type(At)                 ;
+
+NCNBTOpen  : NBTOpen -> type(NBTOpen), pushMode(MATCH_NBT);
+
+NCParameter  : (~[ \n\r$}@`\\] | '\\`')+ -> type(Parameter);
+
+
+NCSPACE    : ' '+ -> type(SPACE);
+ShellEnd   : '`'  -> popMode;
 
 mode MATCH_NBT;
 NBT_String: String -> type(String);

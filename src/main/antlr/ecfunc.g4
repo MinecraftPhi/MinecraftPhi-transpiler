@@ -17,6 +17,7 @@ constant : LET cttypeDefinition constAssign? END_STATEMENT;
 constAssign : Assign constExpression;
 
 constExpression: numericalConstExpression | booleanConstExpression | literal;
+runtimeExpression: constExpression | numericalRuntimeExpression | booleanRuntimeExpression;
 
 functionDefinition: DEF Id
                        ( AngleBOpen  cttypeDefinition (ParamSeparator cttypeDefinition)*   AngleBClose)?
@@ -40,7 +41,7 @@ argument : (Parameter
            | At)*;
 
 
-interpolation: InterpolationOpen constExpression InterpolationClose;
+interpolation: InterpolationOpen runtimeExpression InterpolationClose;
 
 
 
@@ -60,6 +61,7 @@ numericalConstExpression :<assoc=right> numericalConstExpression Pow numericalCo
                          ;
 
 constUnaryOp : numericConstValue
+             | Id
              | op=Min    numericConstValue
              | op=BitNot numericConstValue
              ;
@@ -73,15 +75,56 @@ booleanConstExpression : LogNot booleanConstExpression                          
                        | numericalConstExpression cmp=(LessThan | LessEqual | MoreThan | MoreEqual) numericalConstExpression #constCmp
                        | numericalConstExpression ( cmp=(Equals | NotEquals) numericalConstExpression
                                                   | cmp=Matches range
-                                                  )                                                      #constCmp
-                       | booleanConstExpression LogAnd booleanConstExpression                              #constLogicalAnd
-                       | booleanConstExpression LogOr  booleanConstExpression                              #constLogicalOr
-                       | booleanConstValue                                                               #constBool
+                                                  )                                                       #constCmp
+                       | booleanConstExpression LogAnd booleanConstExpression                             #constLogicalAnd
+                       | booleanConstExpression LogOr  booleanConstExpression                             #constLogicalOr
+                       | booleanConstValue                                                                #constBool
                        ;
 
-booleanConstValue : /*Bool
-                  | */ RoundBOpen booleanConstExpression RoundBClose
+booleanConstValue : Bool
+                  | RoundBOpen booleanConstExpression RoundBClose
                   ;
+
+numericalRuntimeExpression : numericalConstExpression                                                      #constNumericValue
+                           | <assoc=right> numericalRuntimeExpression Pow numericalRuntimeExpression       #runtimeExponent
+                           | runtimeUnaryOp                                                                #runtimeUnary
+                           | numericalRuntimeExpression op=( Mul | Div | Mod ) numericalRuntimeExpression  #runtimeBinOp
+                           | numericalRuntimeExpression op=( Add | Min ) numericalRuntimeExpression        #runtimeBinOp
+                           | numericalRuntimeExpression op=( LeftShift
+                                                         | ArithmicRightShift
+                                                         | LogicalRightShift) numericalRuntimeExpression   #runtimeBinOp
+                           | numericalRuntimeExpression op=BitAnd numericalRuntimeExpression               #runtimeBinOp
+                           | numericalRuntimeExpression op=BitXor numericalRuntimeExpression               #runtimeBinOp
+                           | numericalRuntimeExpression op=BitOr  numericalRuntimeExpression               #runtimeBinOp
+                           ;
+
+runtimeUnaryOp : constUnaryOp
+               | numericRuntimeValue
+               | Id
+               | op=Min    numericRuntimeValue
+               | op=BitNot numericRuntimeValue
+               ;
+
+
+numericRuntimeValue : Shell mcCommand ShellEnd
+                    | RoundBOpen numericalRuntimeExpression RoundBClose
+                    ;
+
+booleanRuntimeExpression : booleanConstExpression                                                               #constBoolValue
+                         | LogNot booleanRuntimeExpression                                                      #runtimeNot
+                         | numericalRuntimeExpression cmp=(LessThan | LessEqual | MoreThan | MoreEqual) numericalRuntimeExpression #runtimeCmp
+                         | numericalRuntimeExpression ( cmp=(Equals | NotEquals) numericalRuntimeExpression
+                                                    | cmp=Matches range
+                                                    )                                                      #runtimeCmp
+                         | booleanRuntimeExpression LogAnd booleanRuntimeExpression                              #runtimeLogicalAnd
+                         | booleanRuntimeExpression LogOr  booleanRuntimeExpression                              #runtimeLogicalOr
+                         | booleanConstValue                                                               #runtimeBool
+                         ;
+
+booleanRuntimeValue : booleanConstValue
+                    | Shell mcCommand ShellEnd
+                    | RoundBOpen booleanRuntimeExpression RoundBClose
+                    ;
 
 rttype : simple_rttype
        | LIST AngleBOpen rttype AngleBClose
